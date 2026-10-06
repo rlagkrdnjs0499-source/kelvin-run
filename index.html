@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#050505">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>Kelvin Running</title>
+
+<style>
+:root{
+  --bg:#050505;
+  --card:#151515;
+  --card2:#1b1b1b;
+  --line:#303030;
+  --text:#f5f5f3;
+  --muted:#8c8c91;
+  --volt:#b8ff00;
+  --danger:#ff453a;
+}
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+}
+
+body{
+  min-height:100vh;
+  padding-bottom:105px;
+}
+
+button,input{
+  font:inherit;
+}
+
+.app{
+  max-width:680px;
+  margin:auto;
+  padding:32px 20px 20px;
+}
+
+/* ---------- GENERAL ---------- */
+
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+}
+
+.eyebrow{
+  color:var(--volt);
+  font-weight:900;
+  letter-spacing:4px;
+  font-size:13px;
+}
+
+.hero-title{
+  font-size:clamp(52px,15vw,90px);
+  font-weight:950;
+  font-style:italic;
+  line-height:.84;
+  letter-spacing:-5px;
+  margin:24px 0 38px;
+}
+
+.section-title{
+  margin-top:42px;
+  margin-bottom:6px;
+  font-size:13px;
+  font-weight:900;
+  color:var(--volt);
+  letter-spacing:3px;
+}
+
+.section-sub{
+  font-size:30px;
+  font-weight:900;
+  font-style:italic;
+  margin:0 0 20px;
+}
+
+.muted{
+  color:var(--muted);
+}
+
+.divider{
+  height:1px;
+  background:var(--line);
+  margin:28px 0;
+}
+
+/* ---------- HOME ---------- */
+
+.goal-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:15px;
+}
+
+.goal-label{
+  color:var(--muted);
+  font-size:15px;
+  margin-bottom:6px;
+}
+
+.goal-pace{
+  font-size:42px;
+  font-weight:950;
+  font-style:italic;
+  letter-spacing:-2px;
+}
+
+.race{
+  text-align:right;
+}
+
+.race span{
+  display:block;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.race strong{
+  font-size:22px;
+}
+
+.progress{
+  width:100%;
+  height:10px;
+  background:#252525;
+  border-radius:99px;
+  overflow:hidden;
+  margin-top:22px;
+}
+
+.progress > div{
+  height:100%;
+  background:var(--volt);
+  width:0%;
+  transition:.4s;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:28px;
+}
+
+.stat{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:22px;
+}
+
+.stat small{
+  color:var(--muted);
+  display:block;
+  font-size:13px;
+  margin-bottom:12px;
+}
+
+.stat strong{
+  font-size:29px;
+  letter-spacing:-1px;
+}
+
+.month-card{
+  margin-top:14px;
+  padding:22px;
+  border-radius:24px;
+  border:1px solid var(--line);
+  background:var(--card);
+}
+
+.month-head{
+  display:flex;
+  justify-content:space-between;
+  font-weight:900;
+  font-size:18px;
+}
+
+.remaining{
+  margin-top:15px;
+  color:var(--muted);
+  font-size:14px;
+}
+
+/* ---------- RUN LIST ---------- */
+
+.run-item{
+  border-bottom:1px solid #242424;
+  padding:19px 0;
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+}
+
+.run-type{
+  color:var(--volt);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:2px;
+}
+
+.run-date{
+  font-size:14px;
+  font-weight:800;
+  margin-top:6px;
+}
+
+.run-right{
+  text-align:right;
+}
+
+.run-distance{
+  font-size:18px;
+  font-weight:900;
+}
+
+.run-pace{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px;
+}
+
+/* ---------- TRACKER ---------- */
+
+.run-page{
+  min-height:calc(100vh - 160px);
+}
+
+.run-heading{
+  margin-top:15px;
+  font-size:56px;
+  line-height:.9;
+  font-weight:950;
+  font-style:italic;
+  letter-spacing:-4px;
+}
+
+.gps-status{
+  margin-top:15px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:13px;
+  color:var(--muted);
+}
+
+.gps-dot{
+  width:9px;
+  height:9px;
+  background:#666;
+  border-radius:50%;
+}
+
+.gps-dot.on{
+  background:var(--volt);
+  box-shadow:0 0 12px var(--volt);
+}
+
+.live-main{
+  text-align:center;
+  margin-top:55px;
+}
+
+.live-distance{
+  font-size:82px;
+  font-weight:950;
+  letter-spacing:-6px;
+  line-height:1;
+}
+
+.live-unit{
+  color:var(--muted);
+  font-weight:800;
+  margin-top:5px;
+}
+
+.live-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:35px;
+}
+
+.live-box{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:20px 10px;
+  text-align:center;
+}
+
+.live-box span{
+  color:var(--muted);
+  font-size:11px;
+  letter-spacing:1px;
+}
+
+.live-box strong{
+  display:block;
+  font-size:27px;
+  margin-top:8px;
+}
+
+.run-controls{
+  margin-top:40px;
+  display:flex;
+  justify-content:center;
+  gap:16px;
+}
+
+.round-btn{
+  width:105px;
+  height:105px;
+  border-radius:50%;
+  border:0;
+  font-weight:950;
+  cursor:pointer;
+}
+
+.start-btn{
+  background:var(--volt);
+  color:#000;
+  font-size:17px;
+}
+
+.pause-btn{
+  background:#262626;
+  color:#fff;
+  display:none;
+}
+
+.finish-btn{
+  background:#fff;
+  color:#000;
+  display:none;
+}
+
+.run-note{
+  text-align:center;
+  color:#666;
+  font-size:12px;
+  line-height:1.5;
+  margin-top:30px;
+}
+
+/* ---------- PLAN ---------- */
+
+.plan-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:20px;
+  margin-bottom:12px;
+}
+
+.plan-top{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.plan-day{
+  color:var(--volt);
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:2px;
+}
+
+.plan-type{
+  font-size:21px;
+  font-weight:900;
+  margin-top:7px;
+}
+
+.plan-distance{
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.plan-desc{
+  color:var(--muted);
+  margin-top:10px;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.interval{
+  border-color:#5b7600;
+}
+
+/* ---------- ADD ---------- */
+
+.form-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:20px;
+}
+
+.field{
+  margin-bottom:18px;
+}
+
+.field label{
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:8px;
+}
+
+.field input,
+.field select{
+  width:100%;
+  padding:15px;
+  border-radius:12px;
+  border:1px solid #343434;
+  background:#0b0b0b;
+  color:white;
+  outline:none;
+}
+
+.save-btn{
+  width:100%;
+  padding:17px;
+  border:0;
+  border-radius:14px;
+  background:var(--volt);
+  color:#000;
+  font-weight:950;
+}
+
+/* ---------- NAV ---------- */
+
+.nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:rgba(5,5,5,.96);
+  border-top:1px solid #262626;
+  padding:10px 8px calc(10px + env(safe-area-inset-bottom));
+  z-index:20;
+  backdrop-filter:blur(15px);
+}
+
+.nav-inner{
+  max-width:680px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+}
+
+.nav button{
+  border:0;
+  background:none;
+  color:#888;
+  padding:10px 2px;
+  font-weight:850;
+  font-size:12px;
+}
+
+.nav button.active{
+  color:var(--volt);
+}
+
+/* ---------- MODAL ---------- */
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.88);
+  z-index:50;
+  display:none;
+  align-items:flex-end;
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modal-box{
+  width:100%;
+  max-width:680px;
+  margin:auto;
+  background:#171717;
+  border-radius:28px 28px 0 0;
+  padding:28px 22px calc(30px + env(safe-area-inset-bottom));
+}
+
+.modal-title{
+  font-size:28px;
+  font-weight:950;
+}
+
+.modal-data{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin:24px 0;
+}
+
+.modal-stat{
+  background:#0b0b0b;
+  padding:18px;
+  border-radius:16px;
+}
+
+.modal-stat small{
+  color:#777;
+}
+
+.modal-stat strong{
+  display:block;
+  font-size:22px;
+  margin-top:6px;
+}
+
+.modal-actions{
+  display:flex;
+  gap:10px;
+}
+
+.modal-actions button{
+  flex:1;
+  padding:16px;
+  border-radius:14px;
+  border:0;
+  font-weight:900;
+}
+
+.cancel{
+  background:#303030;
+  color:#fff;
+}
+
+.confirm{
+  background:var(--volt);
+  color:#000;
+}
+
+@media(max-width:380px){
+  .hero-title{font-size:55px}
+  .goal-pace{font-size:36px}
+  .live-distance{font-size:70px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- HOME -->
+<section id="home" class="page active">
+
+  <div class="eyebrow">KELVIN RUNNING · 2026</div>
+
+  <h1 class="hero-title">
+    ROAD TO<br>
+    SUB 50.
+  </h1>
+
+  <div class="goal-row">
+    <div>
+      <div class="goal-label">10K GOAL PACE</div>
+      <div class="goal-pace">4'59” /KM</div>
+    </div>
+
+    <div class="race">
+      <span>RACE</span>
+      <strong>OCT 31</strong>
+    </div>
+  </div>
+
+  <div class="progress">
+    <div id="raceProgress"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="stats">
+    <div class="stat">
+      <small>OCT DISTANCE</small>
+      <strong id="monthDistance">0.00 km</strong>
+    </div>
+
+    <div class="stat">
+      <small>OCT AVG</small>
+      <strong id="monthPace">--</strong>
+    </div>
+
+    <div class="stat">
+      <small>RUNS</small>
+      <strong id="runCount">0</strong>
+    </div>
+
+    <div class="stat">
+      <small>GOAL</small>
+      <strong>100 km</strong>
+    </div>
+  </div>
+
+  <div class="month-card">
+    <div class="month-head">
+      <span>OCTOBER 100K</span>
+      <span id="monthPercent">0%</span>
+    </div>
+
+    <div class="progress">
+      <div id="monthProgress"></div>
+    </div>
+
+    <div class="remaining" id="remaining">
+      100 km remaining
+    </div>
+  </div>
+
+  <div class="section-title">RECENT RUNS</div>
+  <h2 class="section-sub">KEEP MOVING.</h2>
+
+  <div id="recentRuns"></div>
+
+</section>
+
+
+<!-- RUN -->
+<section id="runs" class="page run-page">
+
+  <div class="eyebrow">LIVE RUN</div>
+
+  <div class="run-heading">
+    JUST<br>RUN.
+  </div>
+
+  <div class="gps-status">
+    <div id="gpsDot" class="gps-dot"></div>
+    <span id="gpsText">GPS READY</span>
+  </div>
+
+  <div class="live-main">
+    <div id="liveDistance" class="live-distance">0.00</div>
+    <div class="live-unit">KILOMETERS</div>
+  </div>
+
+  <div class="live-grid">
+    <div class="live-box">
+      <span>TIME</span>
+      <strong id="liveTime">00:00</strong>
+    </div>
+
+    <div class="live-box">
+      <span>AVG PACE</span>
+      <strong id="livePace">--'--"</strong>
+    </div>
+  </div>
+
+  <div class="run-controls">
+    <button id="startBtn" class="round-btn start-btn" onclick="startRun()">
+      START
+    </button>
+
+    <button id="pauseBtn" class="round-btn pause-btn" onclick="togglePause()">
+      PAUSE
+    </button>
+
+    <button id="finishBtn" class="round-btn finish-btn" onclick="openFinish()">
+      FINISH
+    </button>
+  </div>
+
+  <div class="run-note">
+    야외에서 GPS 권한을 허용해주세요.<br>
+    정확도를 위해 러닝 중에는 웹앱을 활성 상태로 유지하는 것을 권장합니다.
+  </div>
+
+</section>
+
+
+<!-- PLAN -->
+<section id="plan" class="page">
+
+  <div class="eyebrow">10K TRAINING</div>
+
+  <h1 class="hero-title">
+    BREAK<br>
+    50.
+  </h1>
+
+  <div class="goal-row">
+    <div>
+      <div class="goal-label">TARGET</div>
+      <div class="goal-pace">49:59</div>
+    </div>
+
+    <div class="race">
+      <span>RACE DAY</span>
+      <strong>10.31</strong>
+    </div>
+  </div>
+
+  <div class="section-title">WEEKLY PLAN</div>
+  <h2 class="section-sub">RUN WITH PURPOSE.</h2>
+
+  <div class="plan-card">
+    <div class="plan-top">
+      <div>
+        <div class="plan-day">TUE · EASY</div>
+        <div class="plan-type">Easy Run</div>
+      </div>
+      <div class="plan-distance">6–8 KM</div>
+    </div>
+    <div class="plan-desc">
+      5'50"–6'20"/km. 회복과 유산소 베이스에 집중.
+      대화가 가능한 강도로 달린다.
+    </div>
+  </div>
+
+  <div class="plan-card interval">
+    <div class="plan-top">
+      <div>
+        <div class="plan-day">THU · SPEED</div>
+        <div class="plan-type">Intervals</div>
+      </div>
+      <div class="plan-distance">6 × 800M</div>
+    </div>
+
+    <div class="plan-desc">
+      워밍업 2km → 800m × 6회 @ 4'35"–4'45"/km →
+      세트 사이 400m 조깅 → 쿨다운 1–2km.
+    </div>
+  </div>
+
+  <div class="plan-card">
+    <div class="plan-top">
+      <div>
+        <div class="plan-day">SAT · TEMPO</div>
+        <div class="plan-type">Tempo Run</div>
+      </div>
+      <div class="plan-distance">6 KM</div>
+    </div>
+
+    <div class="plan-desc">
+      워밍업 후 메인 4–6km를 5'00"–5'10"/km 부근으로 진행.
+      목표 페이스 적응 훈련.
+    </div>
+  </div>
+
+  <div class="plan-card">
+    <div class="plan-top">
+      <div>
+        <div class="plan-day">SUN · LONG</div>
+        <div class="plan-type">Long Run</div>
+      </div>
+      <div class="plan-distance">10–14 KM</div>
+    </div>
+
+    <div class="plan-desc">
+      5'40"–6'10"/km 범위의 편안한 페이스.
+      거리 적응과 지구력 확보가 목적.
+    </div>
+  </div>
+
+  <div class="section-title">RACE STRATEGY</div>
+  <h2 class="section-sub">CONTROL FIRST.</h2>
+
+  <div class="plan-card">
+    <div class="plan-desc">
+      <strong style="color:white">0–2 KM</strong><br>
+      5'05" 전후로 오버페이스 방지.<br><br>
+
+      <strong style="color:white">3–7 KM</strong><br>
+      4'58"–5'00" 목표 페이스 고정.<br><br>
+
+      <strong style="color:white">8–9 KM</strong><br>
+      여유가 있다면 4'50"대 진입.<br><br>
+
+      <strong style="color:var(--volt)">LAST 1 KM</strong><br>
+      남은 힘 전부 사용.
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ADD -->
+<section id="add" class="page">
+
+  <div class="eyebrow">MANUAL ENTRY</div>
+
+  <h1 class="hero-title">
+    ADD<br>
+    RUN.
+  </h1>
+
+  <div class="form-card">
+
+    <div class="field">
+      <label>DATE</label>
+      <input id="manualDate" type="date">
+    </div>
+
+    <div class="field">
+      <label>DISTANCE (KM)</label>
+      <input id="manualDistance" type="number" step="0.01" placeholder="5.00">
+    </div>
+
+    <div class="field">
+      <label>TIME (MINUTES)</label>
+      <input id="manualMinutes" type="number" step="0.1" placeholder="27.5">
+    </div>
+
+    <div class="field">
+      <label>TYPE</label>
+      <select id="manualType">
+        <option>EASY</option>
+        <option>LONG</option>
+        <option>TEMPO</option>
+        <option>INTERVAL</option>
+        <option>RACE</option>
+      </select>
+    </div>
+
+    <button class="save-btn" onclick="manualSave()">
+      SAVE RUN
+    </button>
+
+  </div>
+
+  <div class="section-title">ALL RUNS</div>
+  <h2 class="section-sub">HISTORY.</h2>
+
+  <div id="allRuns"></div>
+
+</section>
+
+</div>
+
+
+<!-- NAVIGATION -->
+
+<nav class="nav">
+  <div class="nav-inner">
+
+    <button class="active" data-page="home" onclick="showPage('home',this)">
+      HOME
+    </button>
+
+    <button data-page="runs" onclick="showPage('runs',this)">
+      RUN
+    </button>
+
+    <button data-page="plan" onclick="showPage('plan',this)">
+      PLAN
+    </button>
+
+    <button data-page="add" onclick="showPage('add',this)">
+      ADD
+    </button>
+
+  </div>
+</nav>
+
+
+<!-- FINISH MODAL -->
+
+<div id="finishModal" class="modal">
+  <div class="modal-box">
+
+    <div class="eyebrow">RUN COMPLETE</div>
+    <div class="modal-title">SAVE THIS RUN?</div>
+
+    <div class="modal-data">
+
+      <div class="modal-stat">
+        <small>DISTANCE</small>
+        <strong id="finishDistance">0.00 km</strong>
+      </div>
+
+      <div class="modal-stat">
+        <small>TIME</small>
+        <strong id="finishTime">00:00</strong>
+      </div>
+
+      <div class="modal-stat">
+        <small>PACE</small>
+        <strong id="finishPace">--</strong>
+      </div>
+
+      <div class="modal-stat">
+        <small>TYPE</small>
+        <strong>RUN</strong>
+      </div>
+
+    </div>
+
+    <div class="modal-actions">
+      <button class="cancel" onclick="closeFinish()">BACK</button>
+      <button class="confirm" onclick="saveRun()">SAVE</button>
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+
+/* ==========================================================
+   STORAGE
+========================================================== */
+
+const STORAGE_KEY = "kelvinRunningDataV1";
+
+let runs = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+
+/* Initial sample records from Kelvin's current dashboard.
+   They are added only if storage is empty. */
+
+if(runs.length === 0){
+  runs = [
+    {
+      id:1,
+      date:"2026-10-05",
+      distance:11.00,
+      seconds:3542,
+      type:"LONG"
+    },
+    {
+      id:2,
+      date:"2026-10-01",
+      distance:5.02,
+      seconds:1673,
+      type:"EASY"
+    }
+  ];
+
+  persist();
+}
+
+function persist(){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(runs));
+}
+
+
+/* ==========================================================
+   NAV
+========================================================== */
+
+function showPage(page,btn){
+
+  document.querySelectorAll(".page").forEach(el=>{
+    el.classList.remove("active");
+  });
+
+  document.getElementById(page).classList.add("active");
+
+  document.querySelectorAll(".nav button").forEach(el=>{
+    el.classList.remove("active");
+  });
+
+  if(btn) btn.classList.add("active");
+
+  window.scrollTo(0,0);
+
+  if(page==="home" || page==="add"){
+    render();
+  }
+}
+
+
+/* ==========================================================
+   FORMAT
+========================================================== */
+
+function formatTime(seconds){
+
+  seconds = Math.max(0,Math.round(seconds));
+
+  const h = Math.floor(seconds/3600);
+  const m = Math.floor((seconds%3600)/60);
+  const s = seconds%60;
+
+  if(h>0){
+    return `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  }
+
+  return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+}
+
+
+function paceText(seconds,distance){
+
+  if(!distance || distance<=0) return "--'--\"";
+
+  const pace = seconds/distance;
+
+  let min = Math.floor(pace/60);
+  let sec = Math.round(pace%60);
+
+  if(sec===60){
+    min++;
+    sec=0;
+  }
+
+  return `${min}'${String(sec).padStart(2,"0")}"`;
+}
+
+
+/* ==========================================================
+   DASHBOARD
+========================================================== */
+
+function render(){
+
+  const octoberRuns = runs.filter(r=>r.date.startsWith("2026-10"));
+
+  const totalDistance = octoberRuns.reduce(
+    (sum,r)=>sum + Number(r.distance),0
+  );
+
+  const totalSeconds = octoberRuns.reduce(
+    (sum,r)=>sum + Number(r.seconds),0
+  );
+
+  document.getElementById("monthDistance").textContent =
+    totalDistance.toFixed(2)+" km";
+
+  document.getElementById("runCount").textContent =
+    octoberRuns.length;
+
+  document.getElementById("monthPace").textContent =
+    totalDistance ? paceText(totalSeconds,totalDistance) : "--";
+
+  const percent = Math.min(100,totalDistance);
+
+  document.getElementById("monthPercent").textContent =
+    Math.floor(percent)+"%";
+
+  document.getElementById("monthProgress").style.width =
+    percent+"%";
+
+  document.getElementById("remaining").textContent =
+    Math.max(0,100-totalDistance).toFixed(2)+" km remaining";
+
+
+  /* Race month progress */
+
+  const start = new Date("2026-10-01T00:00:00");
+  const race = new Date("2026-10-31T00:00:00");
+  const now = new Date();
+
+  let racePct =
+    ((now-start)/(race-start))*100;
+
+  racePct = Math.max(0,Math.min(100,racePct));
+
+  document.getElementById("raceProgress").style.width =
+    racePct+"%";
+
+
+  const sorted = [...runs].sort(
+    (a,b)=>new Date(b.date)-new Date(a.date)
+  );
+
+  document.getElementById("recentRuns").innerHTML =
+    sorted.slice(0,5).map(runHTML).join("");
+
+  document.getElementById("allRuns").innerHTML =
+    sorted.map(runHTML).join("");
+}
+
+
+function runHTML(r){
+
+  return `
+    <div class="run-item">
+
+      <div>
+        <div class="run-type">${r.type || "RUN"}</div>
+        <div class="run-date">${r.date}</div>
+        <div class="run-pace">${formatTime(r.seconds)}</div>
+      </div>
+
+      <div class="run-right">
+        <div class="run-distance">
+          ${Number(r.distance).toFixed(2)} km
+        </div>
+
+        <div class="run-pace">
+          ${paceText(r.seconds,r.distance)} /km
+        </div>
+      </div>
+
+    </div>
+  `;
+}
+
+
+/* ==========================================================
+   GPS RUN TRACKER
+========================================================== */
+
+let running = false;
+let paused = false;
+
+let watchId = null;
+
+let startTimestamp = 0;
+let pauseStarted = 0;
+let pausedTotal = 0;
+
+let elapsedSeconds = 0;
+
+let timerInterval = null;
+
+let currentDistance = 0;
+let lastPoint = null;
+
+
+/* Haversine distance in meters */
+
+function haversine(lat1,lon1,lat2,lon2){
+
+  const R = 6371000;
+
+  const toRad = deg => deg*Math.PI/180;
+
+  const dLat = toRad(lat2-lat1);
+  const dLon = toRad(lon2-lon1);
+
+  const a =
+    Math.sin(dLat/2)**2 +
+    Math.cos(toRad(lat1)) *
+    Math.cos(toRad(lat2)) *
+    Math.sin(dLon/2)**2;
+
+  return 2*R*Math.atan2(
+    Math.sqrt(a),
+    Math.sqrt(1-a)
+  );
+}
+
+
+function startRun(){
+
+  if(!navigator.geolocation){
+    alert("이 기기에서는 GPS를 사용할 수 없습니다.");
+    return;
+  }
+
+  running=true;
+  paused=false;
+
+  currentDistance=0;
+  lastPoint=null;
+  elapsedSeconds=0;
+  pausedTotal=0;
+
+  startTimestamp=Date.now();
+
+  document.getElementById("startBtn").style.display="none";
+  document.getElementById("pauseBtn").style.display="block";
+  document.getElementById("finishBtn").style.display="block";
+
+  document.getElementById("gpsText").textContent="LOCATING GPS...";
+
+  timerInterval=setInterval(updateTimer,500);
+
+  watchId=navigator.geolocation.watchPosition(
+    handlePosition,
+    gpsError,
+    {
+      enableHighAccuracy:true,
+      maximumAge:0,
+      timeout:15000
+    }
+  );
+}
+
+
+function handlePosition(pos){
+
+  if(!running || paused) return;
+
+  const accuracy=pos.coords.accuracy;
+
+  document.getElementById("gpsDot").classList.add("on");
+
+  document.getElementById("gpsText").textContent =
+    `GPS ACTIVE · ±${Math.round(accuracy)}m`;
+
+  /* Ignore very poor fixes */
+
+  if(accuracy>40) return;
+
+  const point={
+    lat:pos.coords.latitude,
+    lon:pos.coords.longitude,
+    time:pos.timestamp
+  };
+
+  if(lastPoint){
+
+    const meters=haversine(
+      lastPoint.lat,
+      lastPoint.lon,
+      point.lat,
+      point.lon
+    );
+
+    const dt=(point.time-lastPoint.time)/1000;
+
+    /* Filter GPS jumps.
+       Accept realistic movement only. */
+
+    if(
+      meters>=2 &&
+      meters<=100 &&
+      dt>0 &&
+      (meters/dt)<8
+    ){
+      currentDistance += meters/1000;
+    }
+  }
+
+  lastPoint=point;
+
+  updateLive();
+}
+
+
+function gpsError(err){
+
+  document.getElementById("gpsDot").classList.remove("on");
+
+  if(err.code===1){
+    document.getElementById("gpsText").textContent =
+      "GPS PERMISSION DENIED";
+  }else{
+    document.getElementById("gpsText").textContent =
+      "GPS SIGNAL SEARCHING";
+  }
+}
+
+
+function updateTimer(){
+
+  if(!running || paused) return;
+
+  elapsedSeconds =
+    (Date.now()-startTimestamp-pausedTotal)/1000;
+
+  updateLive();
+}
+
+
+function updateLive(){
+
+  document.getElementById("liveDistance").textContent =
+    currentDistance.toFixed(2);
+
+  document.getElementById("liveTime").textContent =
+    formatTime(elapsedSeconds);
+
+  document.getElementById("livePace").textContent =
+    currentDistance>0.03
+      ? paceText(elapsedSeconds,currentDistance)
+      : "--'--\"";
+}
+
+
+function togglePause(){
+
+  if(!running) return;
+
+  if(!paused){
+
+    paused=true;
+    pauseStarted=Date.now();
+
+    document.getElementById("pauseBtn").textContent="RESUME";
+
+    document.getElementById("gpsText").textContent="RUN PAUSED";
+
+  }else{
+
+    paused=false;
+
+    pausedTotal += Date.now()-pauseStarted;
+
+    lastPoint=null;
+
+    document.getElementById("pauseBtn").textContent="PAUSE";
+
+    document.getElementById("gpsText").textContent="GPS ACTIVE";
+  }
+}
+
+
+/* ==========================================================
+   FINISH
+========================================================== */
+
+function openFinish(){
+
+  if(!running) return;
+
+  document.getElementById("finishDistance").textContent =
+    currentDistance.toFixed(2)+" km";
+
+  document.getElementById("finishTime").textContent =
+    formatTime(elapsedSeconds);
+
+  document.getElementById("finishPace").textContent =
+    currentDistance>0
+      ? paceText(elapsedSeconds,currentDistance)
+      : "--";
+
+  document.getElementById("finishModal").classList.add("show");
+}
+
+
+function closeFinish(){
+
+  document.getElementById("finishModal").classList.remove("show");
+}
+
+
+function saveRun(){
+
+  if(currentDistance < 0.01){
+    alert("기록된 거리가 너무 짧습니다.");
+    return;
+  }
+
+  const today=new Date();
+
+  const date=
+    today.getFullYear()+"-"+
+    String(today.getMonth()+1).padStart(2,"0")+"-"+
+    String(today.getDate()).padStart(2,"0");
+
+  runs.push({
+    id:Date.now(),
+    date,
+    distance:Number(currentDistance.toFixed(2)),
+    seconds:Math.round(elapsedSeconds),
+    type:"RUN"
+  });
+
+  persist();
+
+  stopTracking();
+
+  closeFinish();
+
+  render();
+
+  const homeBtn=document.querySelector('[data-page="home"]');
+  showPage("home",homeBtn);
+}
+
+
+function stopTracking(){
+
+  running=false;
+  paused=false;
+
+  clearInterval(timerInterval);
+
+  if(watchId!==null){
+    navigator.geolocation.clearWatch(watchId);
+  }
+
+  watchId=null;
+
+  document.getElementById("gpsDot").classList.remove("on");
+  document.getElementById("gpsText").textContent="GPS READY";
+
+  document.getElementById("startBtn").style.display="block";
+  document.getElementById("pauseBtn").style.display="none";
+  document.getElementById("finishBtn").style.display="none";
+
+  document.getElementById("pauseBtn").textContent="PAUSE";
+
+  currentDistance=0;
+  elapsedSeconds=0;
+  lastPoint=null;
+
+  updateLive();
+}
+
+
+/* ==========================================================
+   MANUAL RUN
+========================================================== */
+
+function manualSave(){
+
+  const date=
+    document.getElementById("manualDate").value;
+
+  const distance=
+    Number(document.getElementById("manualDistance").value);
+
+  const minutes=
+    Number(document.getElementById("manualMinutes").value);
+
+  const type=
+    document.getElementById("manualType").value;
+
+  if(!date || !distance || !minutes){
+    alert("날짜, 거리, 시간을 모두 입력해주세요.");
+    return;
+  }
+
+  runs.push({
+    id:Date.now(),
+    date,
+    distance,
+    seconds:Math.round(minutes*60),
+    type
+  });
+
+  persist();
+
+  document.getElementById("manualDistance").value="";
+  document.getElementById("manualMinutes").value="";
+
+  render();
+
+  alert("러닝 기록 저장 완료.");
+}
+
+
+/* ==========================================================
+   INITIAL
+========================================================== */
+
+const nowDate=new Date();
+
+document.getElementById("manualDate").value =
+  nowDate.getFullYear()+"-"+
+  String(nowDate.getMonth()+1).padStart(2,"0")+"-"+
+  String(nowDate.getDate()).padStart(2,"0");
+
+render();
+
+</script>
+
+</body>
+</html>
